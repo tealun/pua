@@ -388,6 +388,50 @@ cp vscode/prompts/pua.prompt.md .github/prompts/
 
 > **前提设置**：方式一需在 VSCode 设置（`Ctrl+,`）中搜索 `useInstructionFiles`，启用 **`github.copilot.chat.codeGeneration.useInstructionFiles`**；方式二需搜索 `includeApplyingInstructions`，启用 **`chat.includeApplyingInstructions`**；方式三无需任何设置。
 
+#### 全局安装（适用于所有项目，无需每个项目单独配置）
+
+不用在每个项目的 `.github/` 目录里都放一份文件，只需在 VS Code **用户设置**中配置一次，即可对所有工作区全局生效。
+
+**第一步 — 将指令文件保存到固定位置：**
+
+```bash
+mkdir -p ~/.vscode/instructions
+curl -o ~/.vscode/instructions/pua.instructions.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua.instructions.md
+```
+
+**第二步 — 在 VS Code 用户设置中引用该文件**（`Ctrl+,` → "打开用户设置 (JSON)"）：
+
+```json
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": "${userHome}/.vscode/instructions/pua.instructions.md" }
+  ]
+}
+```
+
+这样指令就会在所有项目中自动生效，无需再向 `.github/` 目录复制任何文件。
+
+**可选 — 同时让 `/pua` 提示词命令全局可用：**
+
+```bash
+mkdir -p ~/.vscode/prompts
+curl -o ~/.vscode/prompts/pua.prompt.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua.prompt.md
+```
+
+然后在用户设置中添加：
+
+```json
+{
+  "chat.promptFilesLocations": {
+    "${userHome}/.vscode/prompts": true
+  }
+}
+```
+
+> **提示**：`${userHome}` 在所有平台（Windows / macOS / Linux）上均会解析为当前用户的主目录。用户设置全局生效，无需在各项目中创建 `.github/` 目录。
+
 ## Agent Team 使用指南
 
 > **实验性功能**：Agent Team 需要 Claude Code 最新版本，且设置环境变量 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`。

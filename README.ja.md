@@ -388,6 +388,50 @@ cp vscode/prompts/pua-ja.prompt.md .github/prompts/
 
 > **必須設定**：方式1はVSCode設定（`Ctrl+,`）で `useInstructionFiles` を検索し **`github.copilot.chat.codeGeneration.useInstructionFiles`** を有効化。方式2は `includeApplyingInstructions` を検索し **`chat.includeApplyingInstructions`** を有効化。方式3は設定不要。
 
+#### グローバルインストール（全プロジェクト共通 — プロジェクトごとの設定不要）
+
+プロジェクトごとに `.github/` フォルダへファイルをコピーする代わりに、VS Code の**ユーザー設定**で一度だけ設定すれば、すべてのワークスペースにグローバルで適用されます。
+
+**ステップ1 — 指示ファイルを固定の場所に保存：**
+
+```bash
+mkdir -p ~/.vscode/instructions
+curl -o ~/.vscode/instructions/pua-ja.instructions.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua-ja.instructions.md
+```
+
+**ステップ2 — VS Code ユーザー設定にファイルを追加**（`Ctrl+,` → 「ユーザー設定 (JSON) を開く」）：
+
+```json
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": "${userHome}/.vscode/instructions/pua-ja.instructions.md" }
+  ]
+}
+```
+
+これだけで、すべてのプロジェクトで自動的に指示が有効になります。
+
+**オプション — `/pua` プロンプトコマンドもグローバルで使えるようにする：**
+
+```bash
+mkdir -p ~/.vscode/prompts
+curl -o ~/.vscode/prompts/pua-ja.prompt.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua-ja.prompt.md
+```
+
+ユーザー設定に追加：
+
+```json
+{
+  "chat.promptFilesLocations": {
+    "${userHome}/.vscode/prompts": true
+  }
+}
+```
+
+> **ヒント**：`${userHome}` はすべてのプラットフォーム（Windows / macOS / Linux）でホームディレクトリに解決されます。ユーザー設定はグローバルに適用されるため、各プロジェクトに `.github/` ディレクトリを作成する必要はありません。
+
 ## Agent Team使用ガイド
 
 > **実験的機能**：Agent Teamは最新のClaude Codeバージョンと`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`が必要。
