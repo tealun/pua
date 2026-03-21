@@ -392,7 +392,11 @@ cp vscode/prompts/pua-ja.prompt.md .github/prompts/
 
 プロジェクトごとに `.github/` フォルダへファイルをコピーする代わりに、VS Code の**ユーザー設定**で一度だけ設定すれば、すべてのワークスペースにグローバルで適用されます。
 
-**ステップ1 — 指示ファイルを固定の場所に保存：**
+> **追加スイッチ不要**：この方式は `github.copilot.chat.codeGeneration.instructions` ユーザー設定を使用します。上記の「必須設定」で説明した `useInstructionFiles` トグルとは**完全に独立**しており、追加の VS Code 機能スイッチを有効にする必要はありません。
+
+**ステップ1 — 指示ファイルをローカルの固定パスにダウンロード**
+
+macOS / Linux：
 
 ```bash
 mkdir -p ~/.vscode/instructions
@@ -400,19 +404,40 @@ curl -o ~/.vscode/instructions/pua-ja.instructions.md \
   https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua-ja.instructions.md
 ```
 
-**ステップ2 — VS Code ユーザー設定にファイルを追加**（`Ctrl+,` → 「ユーザー設定 (JSON) を開く」）：
+Windows（PowerShell）：
 
-```json
-{
-  "github.copilot.chat.codeGeneration.instructions": [
-    { "file": "${userHome}/.vscode/instructions/pua-ja.instructions.md" }
-  ]
-}
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.vscode\instructions"
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua-ja.instructions.md" `
+  -OutFile "$env:USERPROFILE\.vscode\instructions\pua-ja.instructions.md"
 ```
 
-これだけで、すべてのプロジェクトで自動的に指示が有効になります。
+**ステップ2 — ユーザー設定 JSON を開いて設定を追加**
 
-**オプション — `/pua` プロンプトコマンドもグローバルで使えるようにする：**
+`Ctrl+,`（macOS：`Cmd+,`）で設定を開き、右上の **「設定 (JSON) を開く」** アイコン（`{}`）をクリック。既存の `{}` の中に追加：
+
+```json
+"github.copilot.chat.codeGeneration.instructions": [
+  { "file": "${userHome}/.vscode/instructions/pua-ja.instructions.md" }
+]
+```
+
+> ⚠️ 既存の `settings.json` に上記の設定を**追加**してください。他の設定を削除しないよう注意。`settings.json` が空の場合、完全な記述例：
+>
+> ```json
+> {
+>   "github.copilot.chat.codeGeneration.instructions": [
+>     { "file": "${userHome}/.vscode/instructions/pua-ja.instructions.md" }
+>   ]
+> }
+> ```
+
+保存後、任意のプロジェクトを再度開くと、`.github/` にファイルをコピーしなくても PUA 指示がすべてのプロジェクトで自動的に有効になります。
+
+**オプション — `/pua` プロンプトコマンドもグローバルで使えるようにする**
+
+macOS / Linux：
 
 ```bash
 mkdir -p ~/.vscode/prompts
@@ -420,17 +445,41 @@ curl -o ~/.vscode/prompts/pua-ja.prompt.md \
   https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua-ja.prompt.md
 ```
 
-ユーザー設定に追加：
+Windows（PowerShell）：
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.vscode\prompts"
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua-ja.prompt.md" `
+  -OutFile "$env:USERPROFILE\.vscode\prompts\pua-ja.prompt.md"
+```
+
+ユーザー設定 JSON に**追加**（置き換えではなく）：
+
+```json
+"chat.promptFilesLocations": {
+  "${userHome}/.vscode/prompts": true
+}
+```
+
+両方の設定を含む `settings.json` の完全な例：
 
 ```json
 {
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": "${userHome}/.vscode/instructions/pua-ja.instructions.md" }
+  ],
   "chat.promptFilesLocations": {
     "${userHome}/.vscode/prompts": true
   }
 }
 ```
 
-> **ヒント**：`${userHome}` はすべてのプラットフォーム（Windows / macOS / Linux）でホームディレクトリに解決されます。ユーザー設定はグローバルに適用されるため、各プロジェクトに `.github/` ディレクトリを作成する必要はありません。
+**動作確認**
+
+VS Code で Copilot Chat を開き（`Ctrl+Alt+I`）、何か質問してみてください。AI の回答に PUA 的な表現（「鉄則」「能動性」「あらゆる方案を尽くす」など）が現れれば、設定が正常に適用されています。
+
+> **ヒント**：`${userHome}` はすべてのプラットフォーム（Windows / macOS / Linux）で VS Code が自動的にホームディレクトリに解決します。手動でパスを書き換える必要はありません。
 
 ## Agent Team使用ガイド
 
