@@ -59,6 +59,7 @@ test_prompt "你怎么又失败了？再试试" "yes" "frustration-zh"
 test_prompt "Try harder, stop giving up" "yes" "frustration-en"
 test_prompt "PUA模式 帮我修这个bug" "yes" "explicit-pua"
 test_prompt "你这个交付质量太差了" "yes" "quality-complaint"
+test_prompt "为什么业务员字段匹配到的是销售模式呢？" "yes" "debug-wrong-field-mapping"
 
 echo ""
 echo "--- Should NOT Trigger ---"

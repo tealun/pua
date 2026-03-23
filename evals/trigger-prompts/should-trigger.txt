@@ -29,3 +29,9 @@ This code is terrible, do it properly
 # PUA mode request
 PUA模式 帮我重构这个模块
 用大厂的方式帮我做这个任务
+
+# Debugging wrong/unexpected results (requires 事实驱动 root-cause investigation — passive "I can't tell" responses are 红线二)
+为什么业务员字段匹配到的是销售模式呢？
+为什么这个字段识别结果不对？
+Why is the salesperson column being matched to sales mode instead of the salesperson field?
+为什么导入识别的列名和实际字段对不上？

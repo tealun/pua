@@ -388,6 +388,99 @@ cp vscode/prompts/pua.prompt.md .github/prompts/
 
 > **前提设置**：方式一需在 VSCode 设置（`Ctrl+,`）中搜索 `useInstructionFiles`，启用 **`github.copilot.chat.codeGeneration.useInstructionFiles`**；方式二需搜索 `includeApplyingInstructions`，启用 **`chat.includeApplyingInstructions`**；方式三无需任何设置。
 
+#### 全局安装（适用于所有项目，无需每个项目单独配置）
+
+不用在每个项目的 `.github/` 目录里都放一份文件，只需在 VS Code **用户设置**中配置一次，即可对所有工作区全局生效。
+
+> **无需额外开关**：此方式使用 `github.copilot.chat.codeGeneration.instructions` 用户设置，与上面"前提设置"里的 `useInstructionFiles` 开关**完全无关**，不需要开启任何额外的 VS Code 功能开关。
+
+**第一步 — 将指令文件下载到本地固定位置**
+
+macOS / Linux：
+
+```bash
+mkdir -p ~/.vscode/instructions
+curl -o ~/.vscode/instructions/pua.instructions.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua.instructions.md
+```
+
+Windows（PowerShell）：
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.vscode\instructions"
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua.instructions.md" `
+  -OutFile "$env:USERPROFILE\.vscode\instructions\pua.instructions.md"
+```
+
+**第二步 — 打开用户设置 JSON，添加以下配置**
+
+按 `Ctrl+,`（macOS：`Cmd+,`）打开设置，点击右上角的 **"打开设置 (JSON)"** 图标（`{}`），在已有的 `{}` 内部添加：
+
+```json
+"github.copilot.chat.codeGeneration.instructions": [
+  { "file": "${userHome}/.vscode/instructions/pua.instructions.md" }
+]
+```
+
+> ⚠️ 只需**添加**上面这一行到你现有的 `settings.json` 里，不要删除其他已有的配置。如果 `settings.json` 里目前什么都没有，完整写法如下：
+>
+> ```json
+> {
+>   "github.copilot.chat.codeGeneration.instructions": [
+>     { "file": "${userHome}/.vscode/instructions/pua.instructions.md" }
+>   ]
+> }
+> ```
+
+保存后，重新打开任意项目，PUA 指令将在所有项目中自动生效，无需复制任何文件到 `.github/`。
+
+**可选 — 同时让 `/pua` 提示词命令全局可用**
+
+macOS / Linux：
+
+```bash
+mkdir -p ~/.vscode/prompts
+curl -o ~/.vscode/prompts/pua.prompt.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua.prompt.md
+```
+
+Windows（PowerShell）：
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.vscode\prompts"
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua.prompt.md" `
+  -OutFile "$env:USERPROFILE\.vscode\prompts\pua.prompt.md"
+```
+
+然后在用户设置 JSON 中同样**添加**（不是替换）：
+
+```json
+"chat.promptFilesLocations": {
+  "${userHome}/.vscode/prompts": true
+}
+```
+
+添加完两项后，完整的 `settings.json` 示例：
+
+```json
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": "${userHome}/.vscode/instructions/pua.instructions.md" }
+  ],
+  "chat.promptFilesLocations": {
+    "${userHome}/.vscode/prompts": true
+  }
+}
+```
+
+**验证是否生效**
+
+在 VS Code 中打开 Copilot Chat（`Ctrl+Alt+I`），输入任意问题。如果 AI 开始在回复中出现 PUA 话术（例如提及"铁律"、"能动性"、"穷尽一切方案"等），说明配置已成功生效。
+
+> **提示**：`${userHome}` 在所有平台（Windows / macOS / Linux）上均由 VS Code 自动解析为当前用户主目录，无需手动替换路径。
+
 ## Agent Team 使用指南
 
 > **实验性功能**：Agent Team 需要 Claude Code 最新版本，且设置环境变量 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`。

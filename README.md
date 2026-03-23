@@ -411,6 +411,99 @@ cp vscode/prompts/pua-en.prompt.md .github/prompts/
 
 > **Required settings**: Method 1 — open VSCode Settings (`Ctrl+,`), search `useInstructionFiles`, enable **`github.copilot.chat.codeGeneration.useInstructionFiles`**. Method 2 — search `includeApplyingInstructions`, enable **`chat.includeApplyingInstructions`**. Method 3 requires no settings.
 
+#### Global Install (applies to all projects — no per-project setup needed)
+
+Instead of copying files into each project's `.github/` folder, you can configure Copilot once in your VS Code **User Settings** and it will apply globally across every workspace.
+
+> **No extra toggles required**: This method uses the `github.copilot.chat.codeGeneration.instructions` User Setting, which is **completely independent** from the `useInstructionFiles` toggle mentioned in the per-project section above. You do not need to enable any additional switches.
+
+**Step 1 — Download the instruction file to a permanent local path**
+
+macOS / Linux:
+
+```bash
+mkdir -p ~/.vscode/instructions
+curl -o ~/.vscode/instructions/pua-en.instructions.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua-en.instructions.md
+```
+
+Windows (PowerShell):
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.vscode\instructions"
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/tealun/pua/main/vscode/instructions/pua-en.instructions.md" `
+  -OutFile "$env:USERPROFILE\.vscode\instructions\pua-en.instructions.md"
+```
+
+**Step 2 — Open User Settings JSON and add the configuration**
+
+Press `Ctrl+,` (macOS: `Cmd+,`) to open Settings, then click the **"Open Settings (JSON)"** icon (`{}`) in the top-right corner. Inside the existing `{}`, add:
+
+```json
+"github.copilot.chat.codeGeneration.instructions": [
+  { "file": "${userHome}/.vscode/instructions/pua-en.instructions.md" }
+]
+```
+
+> ⚠️ Only **add** the line above inside your existing `settings.json` — do not delete your other settings. If your `settings.json` is currently empty, the complete file looks like:
+>
+> ```json
+> {
+>   "github.copilot.chat.codeGeneration.instructions": [
+>     { "file": "${userHome}/.vscode/instructions/pua-en.instructions.md" }
+>   ]
+> }
+> ```
+
+After saving, reopen any project — PUA instructions will be active automatically in every project without copying any files to `.github/`.
+
+**Optional — also make the `/pua` prompt command globally available**
+
+macOS / Linux:
+
+```bash
+mkdir -p ~/.vscode/prompts
+curl -o ~/.vscode/prompts/pua-en.prompt.md \
+  https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua-en.prompt.md
+```
+
+Windows (PowerShell):
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.vscode\prompts"
+Invoke-WebRequest `
+  -Uri "https://raw.githubusercontent.com/tealun/pua/main/vscode/prompts/pua-en.prompt.md" `
+  -OutFile "$env:USERPROFILE\.vscode\prompts\pua-en.prompt.md"
+```
+
+Then **add** (not replace) in User Settings JSON:
+
+```json
+"chat.promptFilesLocations": {
+  "${userHome}/.vscode/prompts": true
+}
+```
+
+Complete `settings.json` example with both settings:
+
+```json
+{
+  "github.copilot.chat.codeGeneration.instructions": [
+    { "file": "${userHome}/.vscode/instructions/pua-en.instructions.md" }
+  ],
+  "chat.promptFilesLocations": {
+    "${userHome}/.vscode/prompts": true
+  }
+}
+```
+
+**Verify it's working**
+
+Open Copilot Chat in VS Code (`Ctrl+Alt+I`), ask any question. If the AI's responses start referencing systematic methodology, performance ratings, or PIP-style pressure, the configuration is active.
+
+> **Tips**: `${userHome}` is automatically resolved by VS Code to the current user's home directory on all platforms (Windows / macOS / Linux) — no manual path substitution needed.
+
 ## Agent Team Usage Guide
 
 > **Experimental**: Agent Team requires the latest Claude Code version with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`.

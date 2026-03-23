@@ -1,6 +1,6 @@
 ---
 name: pua
-description: "Forces high-agency exhaustive problem-solving with corporate PUA pressure escalation. Use when AI is passive, gives up easily, not verifying results, or producing low-quality work. Triggers on: 'try harder', '加油', '别偷懒', 'stop giving up', 'PUA模式', '/pua', '质量太差', '重新做', '你再试试', '为什么还不行', '你怎么又失败了', user frustration or quality complaints, repeated failures (2+), or when agent needs motivation. Applies to ALL task types."
+description: "Forces high-agency exhaustive problem-solving with corporate PUA pressure escalation. Use when AI is passive, gives up easily, not verifying results, or producing low-quality work. Triggers on: 'try harder', '加油', '别偷懒', 'stop giving up', 'PUA模式', '/pua', '质量太差', '重新做', '你再试试', '为什么还不行', '你怎么又失败了', user frustration or quality complaints, repeated failures (2+), or when agent needs motivation. Also triggers on debugging questions about wrong/unexpected results ('为什么X字段匹配到Y', '为什么识别结果不对', 'why is X mapped to Y instead of Z') — do NOT respond passively with 'I cannot determine that'; apply 事实驱动 investigation. Applies to ALL task types."
 license: MIT
 ---
 
